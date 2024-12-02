@@ -1,4 +1,5 @@
 ﻿using System.Net.NetworkInformation;
+using System.Reflection;
 using TestApp.TDD;
 
 namespace TestApp.UnitTests;
@@ -13,15 +14,20 @@ public class DiscountCalculatorTests
     private const decimal OriginalPrice = 100.00M;
     private const decimal NegativePrice = -1.00M; 
     private const string InvalidDiscountCode = "a";
-    private const string SingleUseDiscountCode = "XYZ"; 
+    private const string SingleUseDiscountCode = "XYZ";
+
+    private DiscountPercentageCalculator discountCalculator;
+    
+    [TestInitialize]
+    public void Init()
+    {
+        discountCalculator = new DiscountPercentageCalculator();
+    }
 
     // 1. W przypadku podania pustego kodu rabat nie będzie udzielany.
     [TestMethod]
     public void CalculateDiscount_WhenDiscountCodeIsEmpty_ShouldReturnPrice()
     {
-        // Arrange
-        DiscountCalculator discountCalculator = new DiscountCalculator();
-
         // Act
         var result = discountCalculator.CalculateDiscount(OriginalPrice, string.Empty);
         
@@ -33,9 +39,6 @@ public class DiscountCalculatorTests
     [TestMethod]
     public void CalculateDiscount_WhenDiscountCodeIsSAVE10NOW_ShouldReturnDiscountedPriceBy10Percent()
     {
-        // Arrange
-        DiscountCalculator discountCalculator = new DiscountCalculator();
-        
         // Act
         var result = discountCalculator.CalculateDiscount(OriginalPrice, "SAVE10NOW");
         
@@ -47,24 +50,30 @@ public class DiscountCalculatorTests
     [TestMethod]
     public void CalculateDiscount_WhenDiscountCodeIsDISCOUNT20OFF_ShouldReturnDiscountedPriceBy20Percent()
     {
-        // Arrange
-        DiscountCalculator discountCalculator = new DiscountCalculator();
-        
         // Act
         var result = discountCalculator.CalculateDiscount(OriginalPrice, "DISCOUNT20OFF");
         
         // Assert
         Assert.AreEqual(80.00M, result);
     }
+
+    // [TestMethod]
+    // [DataRow("SAVE10NOW", 90.00M)]
+    // [DataRow("DISCOUNT20OFF", 80.00M)]
+    // public void CalculateDiscount_WhenDiscountCodeIsValid_ShouldReturnDiscountedPriceByExpectedPercent(string discountCode, decimal expectedDiscountedPrice)
+    // {
+    //     // Act
+    //     var result = discountCalculator.CalculateDiscount(OriginalPrice, discountCode);
+    //     
+    //     // Assert
+    //     Assert.AreEqual(expectedDiscountedPrice, result);
+    // }
     
     // 4. Wywołanie metody CalculateDiscount z ujemną ceną powinno rzucić wyjątkiem ArgumentException z komunikatem "Negatives not allowed".
 
     [TestMethod]
     public void CalculateDiscount_WhenNegativePrice_ShouldThrowArgumentExceptionWithMessageNegativesNotAllowed()
     {
-        // Arrange
-        DiscountCalculator discountCalculator = new DiscountCalculator();
-        
         // Act
         Action act = () => discountCalculator.CalculateDiscount(NegativePrice, string.Empty);
         
@@ -78,9 +87,6 @@ public class DiscountCalculatorTests
     [TestMethod]
     public void CalculateDiscount_WhenInvalidDiscountCode_ShouldThrowArgumentExceptionWithMessageInvalidDiscountCode()
     {
-        // Arrange
-        DiscountCalculator discountCalculator = new DiscountCalculator();
-        
         // Act
         Action act = () => discountCalculator.CalculateDiscount(OriginalPrice, InvalidDiscountCode);
         
@@ -94,9 +100,6 @@ public class DiscountCalculatorTests
     [TestMethod]
     public void CalculateDiscount_WhenFirstUseDiscountCodeInPool_ShouldReturnDiscountedPriceBy50Percent()
     {
-        // Arrange
-        DiscountCalculator discountCalculator = new DiscountCalculator();
-        
         // Act
         var result = discountCalculator.CalculateDiscount(OriginalPrice, SingleUseDiscountCode);
         
@@ -109,7 +112,6 @@ public class DiscountCalculatorTests
     public void CalculateDiscount_WhenNextUseDiscountCodeInPool_ShouldThrowArgumentExceptionWithMessageDiscountCodeHasBeenUsed()
     {
         // Arrange
-        DiscountCalculator discountCalculator = new DiscountCalculator();
         discountCalculator.CalculateDiscount(OriginalPrice, SingleUseDiscountCode);
         
         // Act
