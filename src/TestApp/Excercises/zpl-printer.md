@@ -56,12 +56,13 @@ Wymagania realizuj pojedynczo w cyklu:
 
 ## Wymagania
 1. Utwórz metodę _CreateLabel(int width, int height)_ do utworzenia etykiety o podanych rozmiarach
-1. Utwórz metodę _SetText(string text)_ do umieszczenia pola na etykiecie
-2. Pusty tekst powinien rzucać wyjątek _ArgumentNullException_.
-3. Utwórz metodę _SetPosition(int x, int y)_ do ustawienia położenia pola 
-4. Przekroczenie rozmiaru etykiety powinno rzucać wyjątkiem _ArgumentOutOfRangeException_.
-8. Utwórż metodę _SetBarcode(string barcode)_ do drukowania kodu kreskowego w formacie _code 39_
-9. Pusty string powinien rzucać wyjątek _ArgumentNullException_.
+2. Wartości ujemne rozmiaru powinny rzucać wyjątkiem _ArgumentOutOfRangeException_.
+3. Utwórz metodę _SetText(string text)_ do umieszczenia pola na etykiecie
+4. Pusty tekst powinien rzucać wyjątek _ArgumentNullException_.
+5. Utwórz metodę _SetPosition(int x, int y)_ do ustawienia położenia pola 
+6. Przekroczenie rozmiaru etykiety powinno rzucać wyjątkiem _ArgumentOutOfRangeException_.
+7. Utwórż metodę _SetBarcode(string barcode)_ do drukowania kodu kreskowego w formacie _code 39_
+8. Pusty string powinien rzucać wyjątek _ArgumentNullException_.
 
 
 ## Dokumentacja
