@@ -17,8 +17,11 @@ public class AlertServiceTests
         mockMessageService = new Mock<IMessageService>();
         mockAlertRepository = new Mock<IAlertRepository>();
         mockDeviceRepository = new Mock<IDeviceRepository>();
+
+        IAggregateResultService aggregateResultService =
+            new AggregateResultService(mockAlertRepository.Object, mockDeviceRepository.Object);
         
-        sut = new AlertService(mockMessageService.Object, mockAlertRepository.Object, mockDeviceRepository.Object);
+        sut = new AlertService(aggregateResultService, mockMessageService.Object);
     }
     
     [Fact]

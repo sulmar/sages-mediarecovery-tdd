@@ -23,13 +23,13 @@ public class MeasureServiceTests
         Mock<IMessageService> mockMessageService = new Mock<IMessageService>();
         IMessageService messageService = mockMessageService.Object;
         
-        MeasureService measureService = new MeasureService(exchangeRateService, measureRepository, messageService);
+        MeasureService measureService = new MeasureService(exchangeRateService, measureRepository, messageService, new Mapper());
         
         // Act
         measureService.Add(new MeasureDTO() { Value = 10, Unit = "EUR"  } );
         
         // Assert
-         measureService.LastMeasure.ExchangeValue.Should().Be(40);
+         measureService.LastMeasure.Value.Should().Be(40);
         
 
     }
