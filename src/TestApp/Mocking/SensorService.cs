@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using Riok.Mapperly.Abstractions;
 
 namespace TestApp.Mocking;
 
@@ -44,32 +45,53 @@ public interface IMessageService
     public void Send(string message); 
 }
 
+// mapperly
+
+[Mapper]
+public partial class Mapper
+{
+    public partial Measure Map(MeasureDTO dto);
+}
+
+// public class Mapper
+// {
+//     public Measure Map(MeasureDTO dto)
+//     {
+//         return new Measure
+//         {
+//             Unit = dto.Unit,
+//             Value = dto.Value,
+//         };
+//     }
+// }
 
 public class MeasureService
 {
     private readonly IExchangeRateService? _exchangeRateService; 
     private readonly IMeasureRepository _measureRepository;
     private readonly IMessageService _messageService;
-    
+    private readonly Mapper _mapper;
+
     public Measure LastMeasure { get; private set; }
 
-    public MeasureService(IExchangeRateService exchangeRateService, IMeasureRepository measureRepository, IMessageService messageService)
+    public MeasureService(
+        IExchangeRateService exchangeRateService, 
+        IMeasureRepository measureRepository, 
+        IMessageService messageService,
+        Mapper mapper)
     {
         _exchangeRateService = exchangeRateService;
         _measureRepository = measureRepository;
         _messageService = messageService;
+        _mapper = mapper;
     }
     
     public void Add(MeasureDTO dto)
     {
         var exchangeValue = dto.Value * _exchangeRateService.GetExchangeRate(dto.Unit);
 
-        Measure measure = new Measure
-        {
-            Unit = dto.Unit,
-            Value = dto.Value,
-            ExchangeValue = exchangeValue
-        };
+        Measure measure = _mapper.Map(dto);
+        measure.Value = exchangeValue;
 
         _measureRepository.Add(measure);
 
@@ -77,4 +99,6 @@ public class MeasureService
         
         LastMeasure = measure;
     }
+
+    
 }

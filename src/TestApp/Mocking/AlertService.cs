@@ -115,32 +115,93 @@ public interface IDeviceRepository
     Device Get(int deviceId);    
 }
 
-public class AlertService
+
+public class AggregateResult
 {
-    private readonly IMessageService _messageService;
-    private readonly IAlertRepository _repository;
+    public IEnumerable<AlertsModel> Alerts { get; set; }
+    public Device Device { get; set; }
+}
+
+public interface IAggregateResultService
+{
+    AggregateResult Get(int deviceId);
+}
+
+public class AggregateResultService : IAggregateResultService
+{ 
+    private readonly IAlertRepository _alertRepository;
     private readonly IDeviceRepository _deviceRepository;
 
-    public AlertService(
-        IMessageService messageService, 
+    public AggregateResultService( 
         IAlertRepository alertRepository,
         IDeviceRepository deviceRepository)
     {
-        _messageService = messageService;
-        _repository = alertRepository;
+        _alertRepository = alertRepository;
         _deviceRepository = deviceRepository;
+    }
+    public AggregateResult Get(int deviceId)
+    {
+        var alerts = _alertRepository.Get(deviceId);
+        var device = _deviceRepository.Get(deviceId);
+
+        var result = new AggregateResult
+        {
+            Alerts = alerts,
+            Device = device
+        };
+        
+        return result;
+    }
+}
+
+
+public interface IActionResult
+{
+    
+}
+public class AlertsController
+{
+    private readonly IAlertRepository _alertRepository;
+
+    public AlertsController(IAlertRepository alertRepository)
+    {
+        _alertRepository = alertRepository;
+    }
+
+    public IActionResult Get()
+    {
+       throw new NotImplementedException();
+    }
+
+    public IActionResult Post(AlertsModel model)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class AlertService
+{
+    private readonly IAggregateResultService _aggregateResultService;
+    private readonly IMessageService _messageService;
+
+    public AlertService(
+        IAggregateResultService aggregateResultService,
+        IMessageService messageService)
+    {
+        _aggregateResultService = aggregateResultService;
+        _messageService = messageService;
     }
     
     public void SendAlertsToDevice(int deviceId)
     {
         // db
-        var alerts = _repository.Get(deviceId);
+        var result = _aggregateResultService.Get(deviceId);
+        var alerts = result.Alerts;
+        var name = result.Device.Name;
         
         // logika
         foreach (var alert in alerts)
         {
-            var name = _deviceRepository.Get(deviceId)?.Name;
-            
             _messageService.Send($"Alert device name {name}: {alert.Message}");
         }
 
