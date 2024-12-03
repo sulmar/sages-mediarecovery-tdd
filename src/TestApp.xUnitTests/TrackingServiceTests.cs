@@ -1,4 +1,5 @@
-﻿using TestApp.Mocking;
+﻿using Moq;
+using TestApp.Mocking;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace TestApp.xUnitTests;
@@ -27,7 +28,14 @@ public class TrackingServiceTests
     public void Get_JsonIsEmpty_ShouldThrowApplicationExceptionWithMessageErrorParsingTheLocation()
     {
         // Arrange
-        IFileReader fileReader = new EmptyFileReader();
+        Mock<IFileReader> mockFileReader = new Mock<IFileReader>();
+
+        mockFileReader
+            .Setup(x => x.ReadAllText(It.IsAny<string>()))
+            .Returns(string.Empty);
+        
+        IFileReader fileReader = mockFileReader.Object;
+        
         TrackingService trackingService = new TrackingService(fileReader);
 
         // Act

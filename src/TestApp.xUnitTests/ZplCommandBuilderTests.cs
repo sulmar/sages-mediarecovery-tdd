@@ -1,11 +1,22 @@
-﻿using TestApp.Fundamentals;
+﻿using FluentAssertions;
+using TestApp.Fundamentals;
 
 namespace TestApp.xUnitTests;
 
 public class ZplCommandBuilderTests
 {
+    private ZplCommandBuilder builder;
+
+    private const string BeginLabel = "^XA";
+    private const string EndLabel = "^XZ";
+
+    public ZplCommandBuilderTests()
+    {
+        builder = ZplCommandBuilder.CreateLabel(1, 2);
+    }
+    
     [Fact]
-    public void CreateLabel_ValidSize_ShowReturnStartLabel()
+    public void CreateLabel_ValidSize_ShouldReturnStartLabel()
     {
         // Arrange
         
@@ -15,31 +26,32 @@ public class ZplCommandBuilderTests
         // Assert
         string result = builder.Build();
         
-        Assert.Equal("^XA^XZ", result);
+        // Assert.Equal("^XA^XZ", result);
+         result.Should().Be("^XA^XZ");
     }
 
     [Fact]
-    public void SetText_NotEmpty_ShowReturnLabelWithText()
+    public void SetText_NotEmpty_ShouldReturnLabelWithText()
     {
-        // Arrange
-        var builder = ZplCommandBuilder.CreateLabel(1, 2);
-        
         // Act
         builder.SetText("Hello World");
         
         // Assert
         string result = builder.Build();
         
-        Assert.Equal($"^XA^FDHello World^FS^XZ", result);
+        // Assert.Equal($"^XA^FDHello World^FS^XZ", result);
+        // result.Should().Be("^XA^FDHello World^FS^XZ"); // Specific test
+        
+        result.Should()                          // General test
+            .StartWith(BeginLabel)
+            .And.Contain("^FDHello World^FS")
+            .And.EndWith(EndLabel);
     }
 
 
     [Fact]
-    public void SetText_Empty_ShowThrowArgumentNullException()
+    public void SetText_Empty_ShouldThrowArgumentNullException()
     {
-        // Arrange
-        var builder = ZplCommandBuilder.CreateLabel(1, 2);
-        
         // Act
         Action act = () => builder.SetText(string.Empty);
         
@@ -51,9 +63,6 @@ public class ZplCommandBuilderTests
     [Fact]
     public void SetPosition_ValidPosition_ShowReturnLabelWithPosition()
     {
-        // Arrange
-        var builder = ZplCommandBuilder.CreateLabel(1, 2);
-        
         // Act
         builder.SetPosition(1, 2);
         
@@ -71,9 +80,6 @@ public class ZplCommandBuilderTests
     [InlineData(1, -1)] 
     public void SetPosition_InvalidPosition_ThrowArgumentOutOfRangeException(int width, int height)
     {
-        // Arrange
-        var builder = ZplCommandBuilder.CreateLabel(1, 2);
-        
         // Act
         Action act = () => builder.SetPosition(width, height);
         
@@ -85,9 +91,6 @@ public class ZplCommandBuilderTests
     [Fact]
     public void SetBarcode_NotEmpty_ShowReturnLabelWithBarcode()
     {
-        // Arrange
-        var builder = ZplCommandBuilder.CreateLabel(1, 2);
-        
         // Act
         builder.SetBarcode("12345678");
         
@@ -101,9 +104,6 @@ public class ZplCommandBuilderTests
     [Fact]
     public void SetPositionAndBarcode_NotEmpty_ShowReturnLabelWithBarcode()
     {
-        // Arrange
-        var builder = ZplCommandBuilder.CreateLabel(1, 2);
-        
         // Act
         builder.SetPosition(1, 2).SetBarcode("12345678");
         
